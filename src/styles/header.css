@@ -1,0 +1,32 @@
+.header {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  height: 5rem;
+  padding: 0 1rem;
+}
+
+.header__title {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  height: 5rem;
+  font-size: 1rem;
+}
+
+.header__button {
+  margin: auto 5rem;
+  width: 5rem;
+  height: 2rem;
+  border: 2px solid black;
+  background: none;
+  box-shadow: 3px 3px 1px 1px black;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.header__button:hover {
+  box-shadow: 4px 4px 1px 1px black;
+}
