@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Editor, EditorState, Modifier, RichUtils } from 'draft-js';
 import '../styles/text-editor.css';
+import 'draft-js/dist/Draft.css';
 
 export default function TextEditor() {
   const [editorState, setEditorState] = useState(() =>
@@ -33,7 +34,19 @@ export default function TextEditor() {
         newContentState,
         'replace-block'
       );
-      setEditorState(newEditorState);
+
+      const currentStyle = newEditorState.getCurrentInlineStyle();
+
+      let newEditorStateWithoutBold;
+
+      if (currentStyle.has('BOLD')) {
+        newEditorStateWithoutBold = RichUtils.toggleInlineStyle(
+          newEditorState,
+          'BOLD'
+        );
+      }
+
+      setEditorState(newEditorStateWithoutBold ?? newEditorState);
       return;
     } else if (blockText === '# ') {
       const contentState = currentEditorState.getCurrentContent();
@@ -57,6 +70,30 @@ export default function TextEditor() {
         'replace-block'
       );
       setEditorState(newEditorState);
+      return;
+    } else if (blockText === '* ') {
+      const contentState = currentEditorState.getCurrentContent();
+
+      const newContentState = Modifier.replaceText(
+        contentState,
+        currentEditorState.getSelection().merge({
+          anchorOffset: 0,
+          focusOffset: contentState.getBlockForKey(blockKey).getText().length,
+        }),
+        ''
+      );
+
+      const newEditorState = EditorState.push(
+        currentEditorState,
+        newContentState,
+        'replace-block'
+      );
+
+      const newEditorStateWithStyle = RichUtils.toggleInlineStyle(
+        newEditorState,
+        'BOLD'
+      );
+      setEditorState(newEditorStateWithStyle);
       return;
     }
     setEditorState(currentEditorState);
