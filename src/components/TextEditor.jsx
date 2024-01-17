@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import { Editor, EditorState, Modifier, RichUtils } from 'draft-js';
+1;
 import '../styles/text-editor.css';
+import { EditorStateContext } from '../contexts/EditorStateProvider';
 
 const styleMap = {
   RED: {
@@ -9,10 +11,7 @@ const styleMap = {
 };
 
 export default function TextEditor() {
-  const [editorState, setEditorState] = useState(() =>
-    EditorState.createEmpty()
-  );
-
+  const { editorState, setEditorState } = useContext(EditorStateContext);
   const editor = useRef(null);
 
   useEffect(() => {
