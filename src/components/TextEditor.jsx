@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { Editor, EditorState, Modifier, RichUtils } from 'draft-js';
 import '../styles/text-editor.css';
-import 'draft-js/dist/Draft.css';
+
+const styleMap = {
+  RED: {
+    color: 'red',
+  },
+};
 
 export default function TextEditor() {
   const [editorState, setEditorState] = useState(() =>
@@ -37,16 +42,24 @@ export default function TextEditor() {
 
       const currentStyle = newEditorState.getCurrentInlineStyle();
 
-      let newEditorStateWithoutBold;
-
+      let newEditorStateWithoutStyle;
       if (currentStyle.has('BOLD')) {
-        newEditorStateWithoutBold = RichUtils.toggleInlineStyle(
+        newEditorStateWithoutStyle = RichUtils.toggleInlineStyle(
           newEditorState,
           'BOLD'
         );
+      } else if (currentStyle.has('RED')) {
+        newEditorStateWithoutStyle = RichUtils.toggleInlineStyle(
+          newEditorState,
+          'RED'
+        );
+      } else if (currentStyle.has('UNDERLINE')) {
+        newEditorStateWithoutStyle = RichUtils.toggleInlineStyle(
+          newEditorState,
+          'UNDERLINE'
+        );
       }
-
-      setEditorState(newEditorStateWithoutBold ?? newEditorState);
+      setEditorState(newEditorStateWithoutStyle ?? newEditorState);
       return;
     } else if (blockText === '# ') {
       const contentState = currentEditorState.getCurrentContent();
@@ -95,6 +108,54 @@ export default function TextEditor() {
       );
       setEditorState(newEditorStateWithStyle);
       return;
+    } else if (blockText === '** ') {
+      const contentState = currentEditorState.getCurrentContent();
+
+      const newContentState = Modifier.replaceText(
+        contentState,
+        currentEditorState.getSelection().merge({
+          anchorOffset: 0,
+          focusOffset: contentState.getBlockForKey(blockKey).getText().length,
+        }),
+        ''
+      );
+
+      const newEditorState = EditorState.push(
+        currentEditorState,
+        newContentState,
+        'replace-block'
+      );
+
+      const newEditorStateWithStyle = RichUtils.toggleInlineStyle(
+        newEditorState,
+        'RED'
+      );
+      setEditorState(newEditorStateWithStyle);
+      return;
+    } else if (blockText === '*** ') {
+      const contentState = currentEditorState.getCurrentContent();
+
+      const newContentState = Modifier.replaceText(
+        contentState,
+        currentEditorState.getSelection().merge({
+          anchorOffset: 0,
+          focusOffset: contentState.getBlockForKey(blockKey).getText().length,
+        }),
+        ''
+      );
+
+      const newEditorState = EditorState.push(
+        currentEditorState,
+        newContentState,
+        'replace-block'
+      );
+
+      const newEditorStateWithStyle = RichUtils.toggleInlineStyle(
+        newEditorState,
+        'UNDERLINE'
+      );
+      setEditorState(newEditorStateWithStyle);
+      return;
     }
     setEditorState(currentEditorState);
   };
@@ -107,7 +168,12 @@ export default function TextEditor() {
           editor.current.focus();
         }}
       >
-        <Editor ref={editor} editorState={editorState} onChange={onChange} />
+        <Editor
+          ref={editor}
+          editorState={editorState}
+          onChange={onChange}
+          customStyleMap={styleMap}
+        />
       </div>
     </div>
   );
